@@ -29,8 +29,28 @@ void setup() {
   delay(2000);
 }
 
+int indexOf(char* str, char* substr) {
+    int len1 = strlen(str);
+    int len2 = strlen(substr);
+    int i, j;
+
+    for (i = 0; i <= len1 - len2; i++) {
+        for (j = 0; j < len2; j++) {
+            if (str[i+j] != substr[j]) {
+                break;
+            }
+        }
+        if (j == len2) {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+
 void loop() {
-      char locationName[] = "yes";
+      String locationName = locations[2].name;
       lcd.clear();
       lcd.setCursor(0, 1);
       lcd.print("Lat: ");
@@ -54,8 +74,8 @@ void loop() {
     int comma3 = gpsData.indexOf(",", comma2 + 1);
     int comma4 = gpsData.indexOf(",", comma3 + 1);
     int comma5 = gpsData.indexOf(",", comma4 + 1);
-    float lat = gpsData.substring(comma1 + 1, comma2).toFloat();
-    float lon = gpsData.substring(comma3 + 1, comma4).toFloat();
+    float lattitude = gpsData.substring(comma1 + 1, comma2).toFloat();
+    float longitude = gpsData.substring(comma3 + 1, comma4).toFloat();
     // Look up the name of the location from the latitude and longitude
 
 //    for (int i = 0; i < numLocations; i++) {
@@ -71,9 +91,9 @@ void loop() {
   
     // output
     Serial.print("Lat: ");
-    Serial.print(lat, 6);
+    //Serial.print(lat, 6);
     Serial.print(", Lon: ");
-    Serial.print(lon, 6);
+   // Serial.print(lon, 6);
     Serial.print(", Location: ");
     Serial.println(locationName);
   }
