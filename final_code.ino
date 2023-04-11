@@ -1,7 +1,10 @@
+#include <TinyGPS++.h>
 #include <SoftwareSerial.h> // include the SoftwareSerial library for serial communication with the GPS module
 #include <LiquidCrystal.h> // include the LiquidCrystal library for the LCD screen
 
-SoftwareSerial gpsSerial(10, 11); // set up a software serial port for the GPS module (RX=10, TX=11)
+TinyGPSPlus gps;
+
+SoftwareSerial gpsSerial(0, 1); // set up a software serial port for the GPS module (RX=1, TX=0)
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2); // set up the LCD screen (RS=12, E=11, D4=5, D5=4, D6=3, D7=2)
 
 // Define a struct to hold location data
@@ -57,7 +60,20 @@ void setup() {
   lcd.clear();
 }
 
-void loop() {
+void loop()
+{
+  while (gpsSerial.available() > 0)
+    if (gps.encode(gpsSerial.read()))
+      displayInfo();
+
+  if (millis() > 10000 && gps.charsProcessed() < 10)
+  {
+    Serial.println(F("No GPS detected: check wiring."));
+    delay(7000);
+  }
+}
+
+void displayInfo() {
   // Read data from the GPS module
     float lattitude=0;
     float longitude=0;
@@ -77,8 +93,8 @@ void loop() {
       int comma3 = indexOf(ptr, ",", comma2 + 1);
       int comma4 = indexOf(ptr, ",", comma3 + 1);
       int comma5 = indexOf(ptr, ",", comma4 + 1);
-      float lattitude = gpsData.substring(comma1 + 1, comma2).toFloat();
-      float longitude = gpsData.substring(comma3 + 1, comma4).toFloat();
+      float lattitude = gps.location.lat();
+      float longitude = gps.location.lng();
     }
     // Look up the name of the location from the latitude and longitude
     String locationName = "Location not found";
@@ -109,9 +125,10 @@ void loop() {
   
     // output
     Serial.print("Lat: ");
-    Serial.print(lattitude, 6);
+    Serial.print(gps.location.lat(), 10);
+
     Serial.print(", Lon: ");
-    Serial.print(longitude, 6);
+    Serial.print(gps.location.lng(), 10);
     Serial.print(", Location: ");
     Serial.println(locationName);
   
