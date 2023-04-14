@@ -57,16 +57,18 @@ void setup() {
 
 void loop()
 {
-  while (gpsSerial.available() > 0)
-    if (gps.encode(gpsSerial.read()))
+  while (gpsSerial.available() > 0){
+    if (gps.encode(gpsSerial.read())){
       lcd.clear();
       displayInfo();
-
+    }
+  }
   if (millis() > 5000 && gps.charsProcessed() < 15)
   {
     Serial.println(F("No GPS detected: check wiring."));
     delay(500);
   }
+  delay(100);
 }
 
 void displayInfo() {
@@ -77,7 +79,7 @@ void displayInfo() {
     String locationName = "Location not found";
     float dist = 1000;
     for (int i = 0; i < numLocations; i++) {
-      if (abs(locations[i].lattitude - lattitude) < 0.0001 && abs(locations[i].longitude - longitude) < 0.0001) { // allow for some rounding error
+      if (abs(locations[i].lattitude - lattitude) < 0.001 && abs(locations[i].longitude - longitude) < 0.001) { // allow for some rounding error
         float temp_dist = sqrt(pow((locations[i].lattitude - lattitude),2)+pow((locations[i].longitude - longitude),2));
         dist = min(temp_dist, dist);
         if(dist == temp_dist){
@@ -110,7 +112,7 @@ void displayInfo() {
       lcd.autoscroll();
       for(int i=0; i<10; i++){
         lcd.print(" ");
-        delay(100);
+        delay(500);
       }
       lcd.noAutoscroll();
       }
